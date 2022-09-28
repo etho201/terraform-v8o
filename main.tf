@@ -22,7 +22,7 @@ resource "tls_private_key" "ssh" {
   rsa_bits  = 4096
 }
 resource "local_sensitive_file" "ssh_private_key" {
-  filename = "${path.module}/instances/${var.instance_name}/id_rsa"
+  filename = "${path.module}/auth/${var.instance_name}/id_rsa"
   file_permission = "600"
   content = tls_private_key.ssh.private_key_pem
 }
@@ -33,11 +33,11 @@ data "oci_identity_availability_domains" "ads" {
 }
 
 # Create an OCI core instance
-resource "oci_core_instance" "ol_instance" {
+resource "oci_core_instance" "master_node" {
     depends_on = [
       tls_private_key.ssh
     ]
-    display_name = var.instance_name
+    display_name = "${var.instance_name}-master"
     availability_domain = data.oci_identity_availability_domains.ads.availability_domains[2].name
     compartment_id = "${var.compartment_ocid}"
     shape = "VM.Standard.E4.Flex"
@@ -59,12 +59,68 @@ resource "oci_core_instance" "ol_instance" {
     } 
 }
 
+# Create server nodes
+resource "oci_core_instance" "worker_nodes" {
+  for_each = toset( ["1", "2"] )
+  depends_on = [
+    tls_private_key.ssh
+    # local.node_token,
+    # oci_core_network_security_group_security_rule.k3s_api_server,
+    # oci_core_network_security_group_security_rule.k3s_ha_embedded_etcd
+  ]
+  display_name        = "${var.instance_name}-worker${each.key}"
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[2].name
+  compartment_id      = var.compartment_ocid
+  shape = "VM.Standard.E4.Flex"
+
+  source_details {
+    source_id   = var.os_image_ocid
+    source_type = "image"
+  }
+  shape_config {
+    ocpus = 1
+    memory_in_gbs = 16
+  }
+  create_vnic_details {
+    assign_public_ip = true
+    subnet_id        = var.subnet_ocid
+    # nsg_ids          = [var.nsg_ocid]
+  }
+  metadata = {
+    ssh_authorized_keys = tls_private_key.ssh.public_key_openssh
+    # user_data = "${base64encode(data.template_file.cloud_init_nodes.rendered)}"
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "opc"
+    private_key = tls_private_key.ssh.private_key_pem
+    host     = self.public_ip
+  }
+}
+
 output "connection_details" {
-  value = format("ssh -i ./instances/${var.instance_name}/id_rsa opc@%s", oci_core_instance.ol_instance.public_ip)
+  value = format("ssh -i ./auth/${var.instance_name}/id_rsa opc@%s", oci_core_instance.master_node.public_ip)
   description = "Details how to connect using the public IP address of the instance."
 }
 
+locals {
+  k3s_server_ip = oci_core_instance.master_node.public_ip
+  worker_node_1_ip = oci_core_instance.worker_nodes["1"].public_ip
+  worker_node_2_ip = oci_core_instance.worker_nodes["2"].public_ip
+  # node_token = data.external.get_node_token.result.node_token
+}
+
 resource "local_sensitive_file" "readme" {
-  filename = "${path.module}/instances/${var.instance_name}/README.md"
-  content = oci_core_instance.ol_instance.public_ip
+  filename = "${path.module}/auth/${var.instance_name}/README.md"
+  content = oci_core_instance.master_node.public_ip
+}
+resource "local_sensitive_file" "worker1" {
+  filename = "${path.module}/auth/${var.instance_name}/worker1.md"
+  content  = local.worker_node_1_ip
+}
+
+resource "local_sensitive_file" "worker2" {
+  filename = "${path.module}/auth/${var.instance_name}/worker2.md"
+  content  = local.worker_node_2_ip
 }
