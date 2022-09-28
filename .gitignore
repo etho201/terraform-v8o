@@ -3,3 +3,4 @@ terraform.tfvars
 .oci
 terraform.tfstate*
 instances
+auth
