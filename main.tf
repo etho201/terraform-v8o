@@ -71,6 +71,11 @@ resource "oci_core_instance" "control_plane" {
   }
 
   provisioner "file" {
+    source      = "./auth/${var.instance_name}/id_rsa"
+    destination = "/home/opc/.ssh/id_rsa"
+  }
+
+  provisioner "file" {
     content = templatefile("./scripts/create-certs.sh.tftpl", {
       dns_domain_name             = data.oci_core_subnet.my_subnet.subnet_domain_name,
       control_plane_internal_fqdn = "${oci_core_instance.control_plane.hostname_label}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
