@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+cd /etc/olcne
+sudo ./gen-certs-helper.sh \
+--cert-request-organization-unit "Linux" \
+--cert-request-organization "Oracle" \
+--cert-request-locality "Raleigh" \
+--cert-request-state "North Carolina" \
+--cert-request-country US \
+--cert-request-common-name ${dns_domain_name} \
+--nodes ${control_plane_internal_fqdn},${worker1_internal_fqdn},${worker2_internal_fdqn}
+
+sudo chmod 644 /etc/olcne/configs/certificates/tmp-olcne/*/node.key
+
+chmod 600 ~/.ssh/id_rsa
+bash -ex /etc/olcne/configs/certificates/olcne-tranfer-certs.sh
+
+sudo ./gen-certs-helper.sh \
+--cert-dir /etc/olcne/configs/certificates/restrict_external_ip/ \
+--cert-request-organization-unit "Linux" \
+--cert-request-organization "Oracle" \
+--cert-request-locality "Raleigh" \
+--cert-request-state "North Carolina" \
+--cert-request-country US \
+--cert-request-common-name cloud.example.com \
+--nodes externalip-validation-webhook-service.externalip-validation-system.svc,\
+externalip-validation-webhook-service.externalip-validation-system.svc.cluster.local \
+--one-cert \
+--byo-ca-cert /etc/olcne/configs/certificates/production/ca.cert \
+--byo-ca-key /etc/olcne/configs/certificates/production/ca.key
+
+sudo chown -R olcne:olcne /etc/olcne/configs/certificates/restrict_external_ip/
