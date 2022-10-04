@@ -1,3 +1,9 @@
+# mkdir -p $HOME/.kube
+# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# export KUBECONFIG=$HOME/.kube/config
+# echo 'export KUBECONFIG=$HOME/.kube/config' >> $HOME/.bashrc
+
 - name: Create the .kube directory
   ansible.builtin.file:
     path: $HOME/.kube
@@ -15,7 +21,7 @@
   become: yes
   become_method: sudo
 
-- name: Export the kube context
+- name: Export the kube context and setup kubectl
   ansible.builtin.shell: |
     export KUBECONFIG=$HOME/.kube/config
     echo 'export KUBECONFIG=$HOME/.kube/config' >> $HOME/.bashrc

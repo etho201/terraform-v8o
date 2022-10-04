@@ -1,0 +1,10 @@
+- name: Install Verrazzano
+  ansible.builtin.shell: |
+    kubectl apply -f - <<EOF
+    apiVersion: install.verrazzano.io/v1beta1
+    kind: Verrazzano
+    metadata:
+      name: example-verrazzano
+    spec:
+      profile: ${VZ_PROFILE:-dev}
+    EOF

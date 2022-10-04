@@ -1,0 +1,4 @@
+- name: Deploy the Verrazzano platform operator
+  ansible.builtin.shell: |
+    kubectl apply -f https://github.com/verrazzano/verrazzano/releases/download/v1.4.0/verrazzano-platform-operator.yaml
+    kubectl -n verrazzano-install rollout status deployment/verrazzano-platform-operator

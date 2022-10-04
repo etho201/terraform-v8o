@@ -1,4 +1,4 @@
-- name: Bootstrap the Platform Agents
+- name: Create the OCNE Environment and Kubernetes Module
   ansible.builtin.shell: |
     olcnectl environment create --config-file environment.yaml
     olcnectl module create --config-file environment.yaml

@@ -1,8 +1,10 @@
 - hosts: all
-  name: Provision OCNE
+  name: Provision OCNE and Verrazzano
 
   roles:
     - ocne/bootstrap-platform-api
     - ocne/bootstrap-platform-agent
     - ocne/environment
     - ocne/kubectl
+    - verrazzano/install-platform-operator
+    - verrazzano/install-v8o
