@@ -24,11 +24,10 @@ sudo ./gen-certs-helper.sh \
 --cert-request-locality "Raleigh" \
 --cert-request-state "North Carolina" \
 --cert-request-country US \
---cert-request-common-name cloud.example.com \
---nodes externalip-validation-webhook-service.externalip-validation-system.svc,\
-externalip-validation-webhook-service.externalip-validation-system.svc.cluster.local \
+--cert-request-common-name ${dns_domain_name} \
+--nodes ${control_plane_internal_fqdn},${worker1_internal_fqdn},${worker2_internal_fdqn} \
 --one-cert \
 --byo-ca-cert /etc/olcne/configs/certificates/production/ca.cert \
 --byo-ca-key /etc/olcne/configs/certificates/production/ca.key
 
-sudo chown -R olcne:olcne /etc/olcne/configs/certificates/restrict_external_ip/
+sudo chown -R opc:opc /etc/olcne/configs/certificates/restrict_external_ip/
