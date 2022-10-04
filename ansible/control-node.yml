@@ -1,0 +1,8 @@
+- hosts: all
+  name: Provision OCNE
+
+  roles:
+    - ocne/bootstrap-platform-api
+    - ocne/bootstrap-platform-agent
+    - ocne/environment
+    - ocne/kubectl

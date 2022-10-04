@@ -1,0 +1,36 @@
+environments:
+    - environment-name: {{ ENVIRONMENT_NAME }}
+      globals:
+        api-server: 127.0.0.1:8091
+        secret-manager-type: file
+        olcne-ca-path: /etc/olcne/configs/certificates/production/ca.cert
+        olcne-node-cert-path: /etc/olcne/configs/certificates/production/node.cert
+        olcne-node-key-path:  /etc/olcne/configs/certificates/production/node.key
+      modules:
+        - module: kubernetes
+          name: {{ ENVIRONMENT_NAME }}-k8s
+          args:
+            container-registry: container-registry.oracle.com/olcne
+            master-nodes: {{ MASTER_NODES }}
+            worker-nodes: {{ WORKER_NODES }}
+            selinux: enforcing
+            restrict-service-externalip: true
+            restrict-service-externalip-ca-cert: /etc/olcne/configs/certificates/production/ca.cert
+            restrict-service-externalip-tls-cert: /etc/olcne/configs/certificates/restrict_external_ip/production/node.cert
+            restrict-service-externalip-tls-key: /etc/olcne/configs/certificates/restrict_external_ip/production/node.key
+        - module: helm
+          name: {{ ENVIRONMENT_NAME }}-helm
+          args:
+            helm-kubernetes-module: {{ ENVIRONMENT_NAME }}-k8s
+        - module: oci-ccm
+          name: {{ ENVIRONMENT_NAME }}-oci
+          oci-ccm-helm-module: {{ ENVIRONMENT_NAME }}-helm
+          oci-use-instance-principals: false
+          oci-region: {{ REGION }}
+          oci-tenancy: {{ TENANCY }}
+          oci-compartment: {{ COMPARTMENT }}
+          oci-user: {{ USER }}
+          oci-fingerprint: {{ FINGERPRINT }}
+          oci-private-key: /home/opc/.oci/oci_api_key.pem
+          oci-vcn: {{ VCN }}
+          oci-lb-subnet1: {{ SUBNET }}

@@ -32,7 +32,7 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.compartment_ocid
 }
 
-# Create OCI core instance for the OCNE control node
+# Create OCI core instance for the OCNE control plane
 resource "oci_core_instance" "control_plane" {
   depends_on = [
     tls_private_key.ssh
@@ -76,11 +76,19 @@ resource "oci_core_instance" "control_plane" {
   }
 
   provisioner "file" {
+    # source      = "./.oci/oci_api_key.pem"
+    # destination = "/home/opc/.oci/oci_api_key.pem"
+    # Workaround for https://github.com/hashicorp/terraform/issues/16330
+    source      = "./.oci"
+    destination = "/home/opc"
+  }
+
+  provisioner "file" {
     content = templatefile("./scripts/create-certs.sh.tftpl", {
       dns_domain_name             = data.oci_core_subnet.my_subnet.subnet_domain_name,
-      control_plane_internal_fqdn = "${oci_core_instance.control_plane.hostname_label}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
-      worker1_internal_fqdn       = "${oci_core_instance.worker_nodes["1"].hostname_label}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
-      worker2_internal_fdqn       = "${oci_core_instance.worker_nodes["2"].hostname_label}.${data.oci_core_subnet.my_subnet.subnet_domain_name}"
+      control_plane_internal_fqdn = "${oci_core_instance.control_plane.display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker1_internal_fqdn       = "${oci_core_instance.worker_nodes["1"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker2_internal_fdqn       = "${oci_core_instance.worker_nodes["2"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}"
     })
     destination = "/tmp/create-certs.sh"
   }
@@ -90,16 +98,41 @@ resource "oci_core_instance" "control_plane" {
       "/tmp/create-certs.sh",
     ]
   }
+
+  provisioner "file" {
+    content = templatefile("./scripts/create-certs.sh.tftpl", {
+      dns_domain_name             = data.oci_core_subnet.my_subnet.subnet_domain_name,
+      control_plane_internal_fqdn = "${oci_core_instance.control_plane.display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker1_internal_fqdn       = "${oci_core_instance.worker_nodes["1"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker2_internal_fdqn       = "${oci_core_instance.worker_nodes["2"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}"
+    })
+    destination = "/tmp/create-certs.sh"
+  }
+  provisioner "local-exec" {
+    # command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/control-node.yml"
+    command = <<-EOT
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/control-node.yml -e \
+      '{
+        "ENVIRONMENT_NAME":"${var.instance_name}",
+        "MASTER_NODES":"${oci_core_instance.control_plane.display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090",
+        "WORKER_NODES":"${oci_core_instance.worker_nodes["1"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090,${oci_core_instance.worker_nodes["2"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090",
+        "REGION":"${var.region}",
+        "TENANCY":"${var.tenancy_ocid}",
+        "COMPARTMENT":"${var.compartment_ocid}", 
+        "USER":"${var.user_ocid}",
+        "FINGERPRINT":"${var.fingerprint}",
+        "VCN":"${var.vcn_ocid}",
+        "SUBNET":"${var.subnet_ocid}"
+      }'
+    EOT
+  }
 }
 
-# Create server nodes
+# Create worker nodes
 resource "oci_core_instance" "worker_nodes" {
   for_each = toset(["1", "2"])
   depends_on = [
     tls_private_key.ssh
-    # local.node_token,
-    # oci_core_network_security_group_security_rule.k3s_api_server,
-    # oci_core_network_security_group_security_rule.k3s_ha_embedded_etcd
   ]
   display_name        = "${var.instance_name}-worker${each.key}"
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[2].name
@@ -134,6 +167,10 @@ resource "oci_core_instance" "worker_nodes" {
     private_key = tls_private_key.ssh.private_key_pem
     host        = self.public_ip
   }
+
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/workers.yml"
+  }
 }
 
 output "connection_details" {
@@ -145,7 +182,6 @@ locals {
   k3s_server_ip    = oci_core_instance.control_plane.public_ip
   worker_node_1_ip = oci_core_instance.worker_nodes["1"].public_ip
   worker_node_2_ip = oci_core_instance.worker_nodes["2"].public_ip
-  # node_token = data.external.get_node_token.result.node_token
 }
 
 resource "local_sensitive_file" "readme" {

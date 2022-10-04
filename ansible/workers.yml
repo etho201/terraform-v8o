@@ -1,0 +1,6 @@
+- become: yes
+  hosts: all
+  name: Provision OCNE
+
+  roles:
+    - ocne/bootstrap-platform-agent
