@@ -28,6 +28,11 @@ variable "region" {
   type        = string
 }
 
+variable "vcn_ocid" {
+  description = "The OCID of the VCN (required for OCNE)"
+  type        = string
+}
+
 variable "subnet_ocid" {
   description = "The OCID of the subnet to create the VNIC in"
   type        = string
