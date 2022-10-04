@@ -1,15 +1,7 @@
-- name: Create the environment file from a template
-  ansible.builtin.template:
-    src: mytemplates/environment.yaml.j2
-    dest: /home/opc/environment.yaml
-    owner: opc
-    group: opc
-    mode: '0664'
-
 - name: Bootstrap the Platform Agents
   ansible.builtin.shell: |
-    olcnectl environment create --config-file /home/opc/environment.yaml
-    olcnectl module create --config-file /home/opc/environment.yaml
-    olcnectl module validate --config-file /home/opc/environment.yaml
-    olcnectl module install --config-file /home/opc/environment.yaml
-    olcnectl module instances --config-file /home/opc/environment.yaml
+    olcnectl environment create --config-file environment.yaml
+    olcnectl module create --config-file environment.yaml
+    olcnectl module validate --config-file environment.yaml
+    olcnectl module install --config-file environment.yaml
+    olcnectl module instances --config-file environment.yaml

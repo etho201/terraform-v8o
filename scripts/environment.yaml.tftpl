@@ -1,5 +1,5 @@
 environments:
-    - environment-name: {{ ENVIRONMENT_NAME }}
+    - environment-name: ${instance_name}
       globals:
         api-server: 127.0.0.1:8091
         secret-manager-type: file
@@ -8,29 +8,29 @@ environments:
         olcne-node-key-path:  /etc/olcne/configs/certificates/production/node.key
       modules:
         - module: kubernetes
-          name: {{ ENVIRONMENT_NAME }}-k8s
+          name: ${instance_name}-k8s
           args:
             container-registry: container-registry.oracle.com/olcne
-            master-nodes: {{ MASTER_NODES }}
-            worker-nodes: {{ WORKER_NODES }}
+            master-nodes: ${control_plane_internal_fqdn}:8090
+            worker-nodes: ${worker1_internal_fqdn}:8090,${worker2_internal_fdqn}:8090
             selinux: enforcing
             restrict-service-externalip: true
             restrict-service-externalip-ca-cert: /etc/olcne/configs/certificates/production/ca.cert
             restrict-service-externalip-tls-cert: /etc/olcne/configs/certificates/restrict_external_ip/production/node.cert
             restrict-service-externalip-tls-key: /etc/olcne/configs/certificates/restrict_external_ip/production/node.key
         - module: helm
-          name: {{ ENVIRONMENT_NAME }}-helm
+          name: ${instance_name}-helm
           args:
-            helm-kubernetes-module: {{ ENVIRONMENT_NAME }}-k8s
+            helm-kubernetes-module: ${instance_name}-k8s
         - module: oci-ccm
-          name: {{ ENVIRONMENT_NAME }}-oci
-          oci-ccm-helm-module: {{ ENVIRONMENT_NAME }}-helm
+          name: ${instance_name}-oci
+          oci-ccm-helm-module: ${instance_name}-helm
           oci-use-instance-principals: false
-          oci-region: {{ REGION }}
-          oci-tenancy: {{ TENANCY }}
-          oci-compartment: {{ COMPARTMENT }}
-          oci-user: {{ USER }}
-          oci-fingerprint: {{ FINGERPRINT }}
+          oci-region: ${region}
+          oci-tenancy: ${tenancy_ocid}
+          oci-compartment: ${compartment_ocid}
+          oci-user: ${user_ocid}
+          oci-fingerprint: ${fingerprint}
           oci-private-key: /home/opc/.oci/oci_api_key.pem
-          oci-vcn: {{ VCN }}
-          oci-lb-subnet1: {{ SUBNET }}
+          oci-vcn: ${vcn_ocid}
+          oci-lb-subnet1: ${subnet_ocid}

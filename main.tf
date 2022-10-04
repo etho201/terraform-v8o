@@ -108,23 +108,25 @@ resource "oci_core_instance" "control_plane" {
     })
     destination = "/tmp/create-certs.sh"
   }
+
+  provisioner "file" {
+    content = templatefile("./scripts/environment.yaml.tftpl", {
+      instance_name               = "${var.instance_name}",
+      control_plane_internal_fqdn = "${oci_core_instance.control_plane.display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker1_internal_fqdn       = "${oci_core_instance.worker_nodes["1"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      worker2_internal_fdqn       = "${oci_core_instance.worker_nodes["2"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}",
+      region                      = "${var.region}",
+      tenancy_ocid                = "${var.tenancy_ocid}",
+      compartment_ocid            = "${var.compartment_ocid}",
+      user_ocid                   = "${var.user_ocid}",
+      fingerprint                 = "${var.fingerprint}",
+      vcn_ocid                    = "${var.vcn_ocid}",
+      subnet_ocid                 = "${var.subnet_ocid}"
+    })
+    destination = "/home/opc/environment.yaml"
+  }
   provisioner "local-exec" {
-    # command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/control-node.yml"
-    command = <<-EOT
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/control-node.yml -e \
-      '{
-        "ENVIRONMENT_NAME":"${var.instance_name}",
-        "MASTER_NODES":"${oci_core_instance.control_plane.display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090",
-        "WORKER_NODES":"${oci_core_instance.worker_nodes["1"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090,${oci_core_instance.worker_nodes["2"].display_name}.${data.oci_core_subnet.my_subnet.subnet_domain_name}:8090",
-        "REGION":"${var.region}",
-        "TENANCY":"${var.tenancy_ocid}",
-        "COMPARTMENT":"${var.compartment_ocid}", 
-        "USER":"${var.user_ocid}",
-        "FINGERPRINT":"${var.fingerprint}",
-        "VCN":"${var.vcn_ocid}",
-        "SUBNET":"${var.subnet_ocid}"
-      }'
-    EOT
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u opc -i '${self.public_ip},' --private-key ${path.module}/auth/${var.instance_name}/id_rsa ansible/control-node.yml"
   }
 }
 
