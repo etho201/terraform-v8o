@@ -2,11 +2,11 @@
 
 This is a quick reference to make it easier to find your OCID's required to configure the Terraform OCI provider. For detailed information, refer to the official [OCI Documentation](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformproviderconfiguration.htm). 
 
-- [tenancy_ocid](https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/contactingsupport_topic-Finding_Your_Tenancy_OCID_Oracle_Cloud_Identifier.htm): `Profile` --> `Tenancy` --> `OCID`
-- [compartment_ocid](https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/contactingsupport_topic-Finding_the_OCID_of_a_Compartment.htm): `Profile` --> `Identity` --> `Compartments` -- *select your compartment* --> `OCID`
-- user_ocid: `Profile` --> `My Profile` --> `OCID`
-- vcn_ocid: `Cloud Console` --> `Networking` --> *select your VCN* --> `OCID`
-- subnet_ocid: `Cloud Console` --> `Networking` --> *select your VCN* --> `OCID` --> *select your subnet* --> `OCID`
+- [tenancy_ocid](https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/contactingsupport_topic-Finding_Your_Tenancy_OCID_Oracle_Cloud_Identifier.htm): `Profile` ➜ `Tenancy` ➜ `OCID`
+- [compartment_ocid](https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/contactingsupport_topic-Finding_the_OCID_of_a_Compartment.htm): `Profile` ➜ `Identity` ➜ `Compartments` -- *select your compartment* ➜ `OCID`
+- user_ocid: `Profile` ➜ `My Profile` ➜ `OCID`
+- vcn_ocid: `Cloud Console` ➜ `Networking` ➜ *select your VCN* ➜ `OCID`
+- subnet_ocid: `Cloud Console` ➜ `Networking` ➜ *select your VCN* ➜ `OCID` ➜ *select your subnet* ➜ `OCID`
 - [private_key_path](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#two) - *Follow the instructions on the link to generate an API Signing Key.*
 - [fingerprint](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#three) - *Follow the instructions on the link to get the upload your Public Key to OCI and get the fingerprint.*
 
