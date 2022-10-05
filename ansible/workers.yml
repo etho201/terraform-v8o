@@ -1,5 +1,4 @@
-- become: yes
-  hosts: all
+- hosts: all
   name: Provision OCNE
 
   roles:

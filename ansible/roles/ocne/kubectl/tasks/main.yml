@@ -19,7 +19,6 @@
     mode: '0644'
     remote_src: yes
   become: yes
-  become_method: sudo
 
 - name: Export the kube context and setup kubectl
   ansible.builtin.shell: |

@@ -7,4 +7,3 @@
     --olcne-node-key-path /etc/olcne/configs/certificates/production/node.key \
     --olcne-component agent
   become: yes
-  become_method: sudo
