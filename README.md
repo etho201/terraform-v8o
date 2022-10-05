@@ -5,8 +5,8 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
 ## Getting Started:
 
 ### Prerequisites:
-- [ ] Podman (or Docker)
-- [ ] OCI Cloud Credentials
+- [ ] [Podman](https://podman.io/getting-started/installation) (or [Docker](https://docs.docker.com/engine/install/))
+- [ ] [OCI Cloud Credentials](./oci-provider-conf.md)
 
 ### Deployment:
 
