@@ -14,7 +14,7 @@ Plug your OCIDs for each of these items into the [`terraform.tfvars`](./terrafor
 
 Example:
 
-```json
+```bash
 instance_name    = "INSERT_DESIRED_ENVIRONMENT_NAME"
 region           = "us-ashburn-1"
 tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaa******"
