@@ -57,7 +57,7 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
 1. Once Terraform is complete, SSH into the control-plane instance, and run:
 
     ```bash
-    olcnectl module instances --config-file myenvironment.yaml
+    olcnectl module instances --config-file environment.yaml
     ```
 
     > The state should be `installed` for all instances/modules.
