@@ -84,11 +84,13 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
 
 ## Access:
 
-1. Follow the guide provided in the Verrazzano documentation to learn how to access the various components.
+1. Open the OCI Cloud Console and view your [load balancers](https://cloud.oracle.com/load-balancer/). Find the two that were newly created by Verrazzano. Click on each one to view, and click `Edit` next to "Network Security Groups", then select `${instance_name}-web` and press `Save Changes`.
+
+2. Follow the guide provided in the Verrazzano documentation to learn how to access the various components.
 
    - https://verrazzano.io/latest/docs/access/
 
-2. TLDR? You can get a list of endpoints for all the v8o consoles with:
+3. TLDR? You can get a list of endpoints for all the v8o consoles with:
 
     ```bash
     kubectl get vz -o jsonpath="{.items[].status.instance}" | jq .

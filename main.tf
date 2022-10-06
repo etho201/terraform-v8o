@@ -53,6 +53,7 @@ resource "oci_core_instance" "control_plane" {
   create_vnic_details {
     assign_public_ip = true
     subnet_id        = var.subnet_ocid
+    nsg_ids          = [oci_core_network_security_group.insecure_network_security_group.id]
   }
   metadata = {
     ssh_authorized_keys = tls_private_key.ssh.public_key_openssh
@@ -152,7 +153,7 @@ resource "oci_core_instance" "worker_nodes" {
   create_vnic_details {
     assign_public_ip = true
     subnet_id        = var.subnet_ocid
-    # nsg_ids          = [var.nsg_ocid]
+    nsg_ids          = [oci_core_network_security_group.insecure_network_security_group.id]
   }
   metadata = {
     ssh_authorized_keys = tls_private_key.ssh.public_key_openssh
@@ -203,4 +204,18 @@ resource "local_sensitive_file" "worker2" {
 data "oci_core_subnet" "my_subnet" {
   #Required
   subnet_id = var.subnet_ocid
+}
+
+resource "oci_core_network_security_group" "insecure_network_security_group" {
+    compartment_id = var.compartment_ocid
+    vcn_id = var.vcn_ocid
+
+    display_name = "${var.instance_name}-insecure"
+}
+
+resource "oci_core_network_security_group" "web_network_security_group" {
+    compartment_id = var.compartment_ocid
+    vcn_id = var.vcn_ocid
+
+    display_name = "${var.instance_name}-web"
 }
