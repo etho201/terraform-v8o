@@ -47,5 +47,5 @@ variable "instance_name" {
 variable "os_image_ocid" {
   description = "The OCID for the OS image."
   type        = string
-  default     = "ocid1.image.oc1.iad.aaaaaaaa24ckjg36yh22ksnu7wuzozne6wnh5go4dsbycod244oguv42t6lq"
+  default     = "ocid1.image.oc1.iad.aaaaaaaasdqmcux7p5sdhhsqygmfzf2n6smemihykfv4bv7qh4235zre75da"
 }
