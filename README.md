@@ -16,7 +16,7 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
     podman build -t terraform-v8o .
     ```
 
-2. Add your OCI credentials to the `variables.tfvars` file. A sample file ([`variables.tfvars.sample`](./terraform.tfvars.sample)) is provided, but you'll need to input all your `OCID`'s into the file and name it `variables.tfvars`. Use the [cheatsheet](./oci-provider-conf.md) for help finding your `OCID`'s.
+2. Add your OCI credentials to the `terraform.tfvars` file. A sample file ([`terraform.tfvars.sample`](./terraform.tfvars.sample)) is provided, but you'll need to input all your `OCID`'s into the file and name it `terraform.tfvars`. Use the [cheatsheet](./oci-provider-conf.md) for help finding your `OCID`'s.
 
 3. Run terraform to provision and deploy:
     
