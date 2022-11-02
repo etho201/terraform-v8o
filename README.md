@@ -26,7 +26,7 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
     1. Run the following command to deploy:
 
         ```bash
-        podman run -v $(pwd):/tmp --workdir /tmp --rm -it terraform-v8o -c "terraform init -upgrade && terraform apply"
+        podman run -v $(pwd):/tmp:Z --workdir /tmp --rm -it terraform-v8o -c "terraform init -upgrade && terraform apply"
         ```
     </details>
 
@@ -36,7 +36,7 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
      1. Exec into the container with:
 
         ```bash
-        podman run -v $(pwd):/tmp --workdir /tmp --rm -it terraform-v8o
+        podman run -v $(pwd):/tmp:Z --workdir /tmp --rm -it terraform-v8o
         ```
 
      2. Use Terraform within the container to provision and deploy your OCNE + Verrazzano environment.
