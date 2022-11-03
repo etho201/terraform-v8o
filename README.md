@@ -28,6 +28,8 @@ Deploy Oracle OCNE and Verrazzano with Terraform (and Ansible)
         ```bash
         podman run -v $(pwd):/tmp:Z --workdir /tmp --rm -it terraform-v8o -c "terraform init -upgrade && terraform apply"
         ```
+        > **NOTE**: If you're running Podman inside a Vagrant box, you'll need to disable SELinux (`sudo setenforce 0`) and omit the `:Z` if you wish to mount the `/vagrant` synced folder into the container (this does **not** apply to non-synced folders).
+        
     </details>
 
     <details>
